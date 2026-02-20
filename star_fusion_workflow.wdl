@@ -44,6 +44,7 @@ workflow star_fusion_workflow {
       examine_coding_effect        = examine_coding_effect,
       coord_sort_bam               = coord_sort_bam,
       min_FFPM                     = min_FFPM,
+
       preemptible                  = preemptible,
       docker                       = docker,
       cpu                          = num_cpu,
@@ -60,7 +61,6 @@ workflow star_fusion_workflow {
     File fusion_predictions_abridged  = star_fusion.fusion_predictions_abridged
     File? junction                    = star_fusion.junction
     File? bam                         = star_fusion.bam
-    File? bai                         = star_fusion.bai
     File? sj                          = star_fusion.sj
 
     File? coding_effect               = star_fusion.coding_effect
@@ -135,9 +135,12 @@ task star_fusion {
 
       # --- FASTQ input mode (original behavior) ---
       if [[ ! -z "~{fastq_pair_tar_gz}" ]]; then
+        # untar the fq pair
         mv ~{fastq_pair_tar_gz} reads.tar.gz
         tar xvf reads.tar.gz
+
         left_fq=(*_1.fastq* *_1.fq*)
+
         if [[ ! -z "*_2.fastq*" ]] || [[ ! -z "*_2.fq*" ]]; then
           right_fq=(*_2.fastq* *_2.fq*)
         fi
@@ -153,6 +156,7 @@ task star_fusion {
       fi
 
       left_fqs=$(IFS=, ; echo "${left_fq[*]}")
+      
       read_params="--left_fq ${left_fqs}"
       if [[ "${right_fq[0]}" != "" ]]; then
         right_fqs=$(IFS=, ; echo "${right_fq[*]}")
