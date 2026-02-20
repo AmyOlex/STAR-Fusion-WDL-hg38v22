@@ -52,6 +52,7 @@ workflow star_fusion_hg38_wf {
       left_fq = left_fq,
       right_fq = right_fq,
       fastq_pair_tar_gz = fastq_pair_tar_gz,
+      input_chimeric_junction = input_chimeric_junction,
       genome_plug_n_play_tar_gz = genome_plug_n_play_tar_gz,
       sample_id = sample_id,
       examine_coding_effect = examine_coding_effect,
@@ -64,7 +65,7 @@ workflow star_fusion_hg38_wf {
       genome_disk_space_multiplier = genome_disk_space_multiplier,
       fusion_inspector = fusion_inspector,
       use_ssd = use_ssd
-      input_chimeric_junction = input_chimeric_junction,
+      
   }
 
   output {
