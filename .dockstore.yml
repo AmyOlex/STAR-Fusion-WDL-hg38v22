@@ -5,4 +5,4 @@ workflows:
      primaryDescriptorPath: /star_fusion_hg38_wf.wdl
      authors:
          - name: Brian Haas
-	 	 - name: Amy Olex
+         - name: Amy Olex
