@@ -71,9 +71,9 @@ workflow star_fusion_hg38_wf {
   output {
     File fusion_predictions = star_fusion_hg38.fusion_predictions
     File fusion_predictions_abridged = star_fusion_hg38.fusion_predictions_abridged
-    File junction = star_fusion_hg38.junction
-    File bam = star_fusion_hg38.bam
-    File sj = star_fusion_hg38.sj
+    File? junction = star_fusion_hg38.junction
+    File? bam = star_fusion_hg38.bam
+    File? sj = star_fusion_hg38.sj
     
     File? coding_effect = star_fusion_hg38.coding_effect
 

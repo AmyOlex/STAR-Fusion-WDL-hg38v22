@@ -156,7 +156,7 @@ task star_fusion {
       fi
 
       left_fqs=$(IFS=, ; echo "${left_fq[*]}")
-      
+
       read_params="--left_fq ${left_fqs}"
       if [[ "${right_fq[0]}" != "" ]]; then
         right_fqs=$(IFS=, ; echo "${right_fq[*]}")
@@ -225,7 +225,6 @@ task star_fusion {
 
     File? junction       = "~{sample_id}.Chimeric.out.junction.gz"
     File? bam            = if (coord_sort_bam) then "~{sample_id}.STAR.aligned.coordsorted.bam" else "~{sample_id}.STAR.aligned.UNsorted.bam"
-    File? bai            = "~{sample_id}.STAR.aligned.coordsorted.bam.bai"
     File? sj             = "~{sample_id}.SJ.out.tab.gz"
     File? star_log_final = "~{sample_id}.Log.final.out"
 
