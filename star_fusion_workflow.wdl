@@ -229,7 +229,7 @@ task star_fusion {
     File? star_log_final = "~{sample_id}.Log.final.out"
 
     File? coding_effect              = "~{sample_id}/star-fusion.fusion_predictions.abridged.coding_effect.tsv"
-    Array[File] extract_fusion_reads = glob("~{sample_id}/star-fusion.fusion_evidence_*.fq")
+    Array[File]? extract_fusion_reads = glob("~{sample_id}/star-fusion.fusion_evidence_*.fq")
 
     File? fusion_inspector_validate_fusions_abridged = "~{sample_id}/FusionInspector-validate/finspector.FusionInspector.fusions.abridged.tsv"
     File? fusion_inspector_validate_web              = "~{sample_id}/FusionInspector-validate/finspector.fusion_inspector_web.html"
