@@ -109,7 +109,7 @@ task star_fusion {
                         (if defined(right_fq) then size(right_fq, "GB") else 0) +
                         (if defined(fastq_pair_tar_gz) then size(fastq_pair_tar_gz, "GB") else 0)
   Float input_disk    = if defined(input_chimeric_junction)
-                        then junction_size * 2
+                        then junction_size * 2 + fastq_disk_space_multiplier * fastq_size
                         else fastq_disk_space_multiplier * fastq_size
 
   command <<<
@@ -119,7 +119,42 @@ task star_fusion {
     mkdir -p ~{sample_id}
 
     # -----------------------------------------------------------------------
-    # Build input params depending on mode
+    # Build input params
+    # -----------------------------------------------------------------------
+
+    if [[ ! -z "~{fastq_pair_tar_gz}" ]]; then
+        # untar the fq pair
+        mv ~{fastq_pair_tar_gz} reads.tar.gz
+        tar xvf reads.tar.gz
+
+        left_fq=(*_1.fastq* *_1.fq*)
+    
+        if [[ ! -z "*_2.fastq*" ]] || [[ ! -z "*_2.fq*" ]]; then
+             right_fq=(*_2.fastq* *_2.fq*)
+        fi
+    else
+        left_fq="~{left_fq}"
+        right_fq="~{right_fq}"
+    fi
+
+
+    if [[ -z "${left_fq[0]}" && -z "${right_fq[0]}" ]]; then
+        echo "Error, not finding fastq files here"
+        ls -ltr
+        exit 1
+    fi
+
+    left_fqs=$(IFS=, ; echo "${left_fq[*]}")
+    
+    read_params="--left_fq ${left_fqs}"
+
+    if [[ "${right_fq[0]}" != "" ]]; then
+      right_fqs=$(IFS=, ; echo "${right_fq[*]}")   
+      read_params="${read_params} --right_fq ${right_fqs}"
+    fi
+
+    # -----------------------------------------------------------------------
+    # Add Chimeric junctions if provided
     # -----------------------------------------------------------------------
     if [[ ! -z "~{input_chimeric_junction}" ]]; then
 
@@ -129,40 +164,7 @@ task star_fusion {
         gunzip -c "${chimeric_junc}" > chimeric.out.junction
         chimeric_junc="chimeric.out.junction"
       fi
-      read_params="-J ${chimeric_junc}"
-
-    else
-
-      # --- FASTQ input mode (original behavior) ---
-      if [[ ! -z "~{fastq_pair_tar_gz}" ]]; then
-        # untar the fq pair
-        mv ~{fastq_pair_tar_gz} reads.tar.gz
-        tar xvf reads.tar.gz
-
-        left_fq=(*_1.fastq* *_1.fq*)
-
-        if [[ ! -z "*_2.fastq*" ]] || [[ ! -z "*_2.fq*" ]]; then
-          right_fq=(*_2.fastq* *_2.fq*)
-        fi
-      else
-        left_fq="~{left_fq}"
-        right_fq="~{right_fq}"
-      fi
-
-      if [[ -z "${left_fq[0]}" && -z "${right_fq[0]}" ]]; then
-        echo "Error, not finding fastq files here"
-        ls -ltr
-        exit 1
-      fi
-
-      left_fqs=$(IFS=, ; echo "${left_fq[*]}")
-
-      read_params="--left_fq ${left_fqs}"
-      if [[ "${right_fq[0]}" != "" ]]; then
-        right_fqs=$(IFS=, ; echo "${right_fq[*]}")
-        read_params="${read_params} --right_fq ${right_fqs}"
-      fi
-
+      read_params="${read_params} -J ${chimeric_junc}"
     fi
 
     # -----------------------------------------------------------------------
